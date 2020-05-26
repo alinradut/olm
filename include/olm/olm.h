@@ -227,6 +227,32 @@ size_t olm_account_one_time_keys(
     void * one_time_keys, size_t one_time_keys_length
 );
 
+/** The size of the output buffer needed to hold all the one time keys */
+size_t olm_account_all_one_time_keys_length(
+    OlmAccount *account);
+
+/** Writes the public parts of all the one time keys for the account
+ * into the one_time_keys output buffer.
+ * <p>
+ * The returned data is a JSON-formatted object with the single property
+ * <tt>curve25519</tt>, which is itself an object mapping key id to
+ * base64-encoded Curve25519 key. For example:
+ * <pre>
+ * {
+ *     curve25519: {
+ *         "AAAAAA": "wo76WcYtb0Vk/pBOdmduiGJ0wIEjW4IBMbbQn7aSnTo",
+ *         "AAAAAB": "LRvjo46L1X2vx69sS9QNFD29HWulxrmW11Up5AfAjgU"
+ *     }
+ * }
+ * </pre>
+ * Returns olm_error() on failure.
+ * <p>
+ * If the one_time_keys buffer was too small then olm_account_last_error()
+ * will be "OUTPUT_BUFFER_TOO_SMALL". */
+size_t olm_account_all_one_time_keys(
+    OlmAccount *account,
+    void *one_time_keys, size_t one_time_keys_length);
+
 /** Marks the current set of one time keys as being published. */
 size_t olm_account_mark_keys_as_published(
     OlmAccount * account

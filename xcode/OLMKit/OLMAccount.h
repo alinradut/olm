@@ -35,6 +35,9 @@
 /** Public parts of the unpublished one time keys for the account */
 - (NSDictionary*) oneTimeKeys;
 
+/** Public parts of all one time keys for the account */
+- (NSDictionary *) allOneTimeKeys;
+
 - (BOOL) removeOneTimeKeysForSession:(OLMSession*)session;
 
 /** Marks the current set of one time keys as being published. */

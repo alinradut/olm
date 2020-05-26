@@ -381,6 +381,22 @@ size_t olm_account_one_time_keys(
 }
 
 
+size_t olm_account_all_one_time_keys_length(
+    OlmAccount *account)
+{
+    return from_c(account)->get_all_one_time_keys_json_length();
+}
+
+
+size_t olm_account_all_one_time_keys(
+    OlmAccount *account,
+    void *one_time_keys_json, size_t one_time_key_json_length)
+{
+    return from_c(account)->get_all_one_time_keys_json(
+        from_c(one_time_keys_json), one_time_key_json_length);
+}
+
+
 size_t olm_account_mark_keys_as_published(
     OlmAccount * account
 ) {

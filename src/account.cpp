@@ -218,6 +218,66 @@ std::size_t olm::Account::get_one_time_keys_json(
 }
 
 
+std::size_t olm::Account::get_all_one_time_keys_json_length()
+{
+    std::size_t length = 0;
+    bool is_empty = true;
+    for (auto const &key : one_time_keys)
+    {
+        is_empty = false;
+        length += 2; /* {" */
+        length += olm::encode_base64_length(_olm_pickle_uint32_length(key.id));
+        length += 3; /* ":" */
+        length += olm::encode_base64_length(sizeof(key.key.public_key));
+        length += 1; /* " */
+    }
+    if (is_empty)
+    {
+        length += 1; /* { */
+    }
+    length += 3; /* }{} */
+    length += sizeof(KEY_JSON_CURVE25519) - 1;
+    return length;
+}
+
+
+std::size_t olm::Account::get_all_one_time_keys_json(
+    std::uint8_t *one_time_json, std::size_t one_time_json_length)
+{
+    std::uint8_t *pos = one_time_json;
+    if (one_time_json_length < get_one_time_keys_json_length())
+    {
+        last_error = OlmErrorCode::OLM_OUTPUT_BUFFER_TOO_SMALL;
+        return std::size_t(-1);
+    }
+    *(pos++) = '{';
+    pos = write_string(pos, KEY_JSON_CURVE25519);
+    std::uint8_t sep = '{';
+    for (auto const &key : one_time_keys)
+    {
+        *(pos++) = sep;
+        *(pos++) = '\"';
+        std::uint8_t key_id[_olm_pickle_uint32_length(key.id)];
+        _olm_pickle_uint32(key_id, key.id);
+        pos = olm::encode_base64(key_id, sizeof(key_id), pos);
+        *(pos++) = '\"';
+        *(pos++) = ':';
+        *(pos++) = '\"';
+        pos = olm::encode_base64(
+            key.key.public_key.public_key, sizeof(key.key.public_key.public_key), pos);
+        *(pos++) = '\"';
+        sep = ',';
+    }
+    if (sep != ',')
+    {
+        /* The list was empty */
+        *(pos++) = sep;
+    }
+    *(pos++) = '}';
+    *(pos++) = '}';
+    return pos - one_time_json;
+}
+
 std::size_t olm::Account::mark_keys_as_published(
 ) {
     std::size_t count = 0;

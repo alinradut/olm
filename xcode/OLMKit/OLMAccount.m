@@ -144,6 +144,27 @@
     return keysDictionary;
 }
 
+- (NSDictionary*) allOneTimeKeys {
+    size_t otkLength = olm_account_all_one_time_keys_length(_account);
+    uint8_t *otkBytes = malloc(otkLength);
+    if (!otkBytes) {
+        return nil;
+    }
+    size_t result = olm_account_all_one_time_keys(_account, otkBytes, otkLength);
+    if (result == olm_error()) {
+        const char *error = olm_account_last_error(_account);
+        NSLog(@"error getting id keys: %s", error);
+        free(otkBytes);
+        return nil;
+    }
+    NSData *otk = [NSData dataWithBytesNoCopy:otkBytes length:otkLength freeWhenDone:YES];
+    NSError *error = nil;
+    NSDictionary *keysDictionary = [NSJSONSerialization JSONObjectWithData:otk options:0 error:&error];
+    if (error) {
+        NSLog(@"Could not decode JSON: %@", error.localizedDescription);
+    }
+    return keysDictionary;
+}
 
 - (void) generateOneTimeKeys:(NSUInteger)numberOfKeys {
     size_t randomLength = olm_account_generate_one_time_keys_random_length(_account, numberOfKeys);

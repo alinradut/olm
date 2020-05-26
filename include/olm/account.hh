@@ -104,6 +104,25 @@ struct Account {
         std::uint8_t * one_time_json, std::size_t one_time_json_length
     );
 
+    /** Number of bytes needed to output all the one time keys for this account */
+    std::size_t get_all_one_time_keys_json_length();
+
+    /** Output the one time keys as JSON, regardless of whether they were 
+     * published or not:
+     *
+     *  {"curve25519":
+     *  ["<6 byte key id>":"<43 base64 characters>"
+     *  ,"<6 byte key id>":"<43 base64 characters>"
+     *  ...
+     *  ]
+     *  }
+     *
+     * Returns the size of the JSON written or std::size_t(-1) on error.
+     * If the buffer is too small last_error will be OUTPUT_BUFFER_TOO_SMALL.
+     */
+    std::size_t get_all_one_time_keys_json(
+        std::uint8_t *one_time_json, std::size_t one_time_json_length);
+
     /** Mark the current list of one_time_keys as being published. They
      * will no longer be returned by get_one_time_keys_json_length(). */
     std::size_t mark_keys_as_published();
